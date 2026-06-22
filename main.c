@@ -195,9 +195,13 @@ int SDL_main(int argc, char* args[])
     notify_dbg("%s %s starting (%s %s)", WINDOW_TITLE, VERSION_TAG, __DATE__, __TIME__);
 
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) < 0) {
-        printf("SDL_Init: %s\n", SDL_GetError());
-	notify_err("SDL_Init failed: %s", SDL_GetError());
-	return -1;
+        notify_err("SDL_Init (full) failed: %s – retrying without audio", SDL_GetError());
+        printf("SDL_Init (full): %s\n", SDL_GetError());
+        if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
+            printf("SDL_Init: %s\n", SDL_GetError());
+            notify_err("SDL_Init failed: %s", SDL_GetError());
+            return -1;
+        }
     }
     notify_dbg("SDL_Init OK");
 
