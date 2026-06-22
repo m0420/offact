@@ -245,6 +245,10 @@ int SDL_main(int argc, char* args[])
     notify_dbg("ListUI created, loading accounts...");
     refreshListUI();
     notify_dbg("Account list loaded, entering main loop");
+
+    while(!quit) {
+	while(SDL_PollEvent(&event) != 0) {
+	    if(event.type == SDL_CONTROLLERBUTTONDOWN) {
 		switch(event.cbutton.button) {
 		case SDL_CONTROLLER_BUTTON_DPAD_UP:
 		    ListUI_NavigateItemUp(ui, SDL_FALSE, SDL_TRUE);
