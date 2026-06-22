@@ -25,21 +25,14 @@ along with this program; see the file COPYING. If not, see
 /* PS5 system notification request struct (standard PS5 scene layout)  */
 /* ------------------------------------------------------------------ */
 
-typedef struct SceNotificationRequest
-{
-    int   type;         /* 0 = standard toast                         */
-    int   unk1;         /* -1                                         */
-    int   unk2;         /* 0                                          */
-    int   use_icon_uri; /* 0 = use default icon                       */
-    char  icon_uri[1024];
-    char  message[1024];
-    int   unk3;         /* 0                                          */
-    char  unk4[12];
-} SceNotificationRequest;
+typedef struct notify_request {
+    char unused[45];
+    char message[3075];
+} notify_request_t;
 
-/* Provided by libkernel; no header needed, extern is sufficient. */
+/* Provided by libkernel. */
 extern int sceKernelSendNotificationRequest(int dev,
-                                            SceNotificationRequest *req,
+                                            notify_request_t *req,
                                             size_t size,
                                             int blocking);
 
@@ -50,16 +43,9 @@ extern int sceKernelSendNotificationRequest(int dev,
 
 static void send_notification(const char *msg)
 {
-    SceNotificationRequest req;
+    notify_request_t req;
     memset(&req, 0, sizeof(req));
-    req.type         =  0;
-    req.unk1         = -1;
-    req.unk2         =  0;
-    req.use_icon_uri =  0;
-    req.unk3         =  0;
-
     snprintf(req.message, sizeof(req.message), "%s", msg);
-
     sceKernelSendNotificationRequest(0, &req, sizeof(req), 0);
 }
 
