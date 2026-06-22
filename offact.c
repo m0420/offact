@@ -15,6 +15,7 @@ along with this program; see the file COPYING. If not, see
 <http://www.gnu.org/licenses/>.  */
 
 #include "offact.h"
+#include "notify.h"
 
 
 int sceRegMgrGetInt(int, int*);
@@ -50,8 +51,15 @@ int OffAct_GetAccountName(int account_numb, char val[ACCOUNT_NAME_MAX])
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125829632U,
 				   127140352U);
+    int rc;
     *val = 0;
-    return sceRegMgrGetStr(n, val, ACCOUNT_NAME_MAX);
+    rc = sceRegMgrGetStr(n, val, ACCOUNT_NAME_MAX);
+    if(rc)
+	notify_err("GetAccountName slot %d: sceRegMgrGetStr(0x%x) = 0x%x",
+		   account_numb, n, rc);
+    else
+	notify_dbg("GetAccountName slot %d: \"%s\"", account_numb, val);
+    return rc;
 }
 
 
@@ -59,8 +67,15 @@ int OffAct_GetAccountId(int account_numb, uint64_t* val)
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125830400U,
 				   127141120U);
+    int rc;
     *val = 0;
-    return sceRegMgrGetBin(n, val, sizeof(uint64_t));
+    rc = sceRegMgrGetBin(n, val, sizeof(uint64_t));
+    if(rc)
+	notify_err("GetAccountId slot %d: sceRegMgrGetBin(0x%x) = 0x%x",
+		   account_numb, n, rc);
+    else
+	notify_dbg("GetAccountId slot %d: 0x%lx", account_numb, *val);
+    return rc;
 }
 
 
@@ -68,7 +83,13 @@ int OffAct_SetAccountId(int account_numb, uint64_t val)
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125830400U,
 				   127141120U);
-    return sceRegMgrSetBin(n, &val, sizeof(uint64_t));
+    int rc = sceRegMgrSetBin(n, &val, sizeof(uint64_t));
+    if(rc)
+	notify_err("SetAccountId slot %d 0x%lx: sceRegMgrSetBin(0x%x) = 0x%x",
+		   account_numb, val, n, rc);
+    else
+	notify_dbg("SetAccountId slot %d: 0x%lx written OK", account_numb, val);
+    return rc;
 }
 
 
@@ -76,8 +97,15 @@ int OffAct_GetAccountType(int account_numb, char val[ACCOUNT_TYPE_MAX])
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125874183U,
 				   127184903U);
+    int rc;
     *val = 0;
-    return sceRegMgrGetStr(n, val, ACCOUNT_TYPE_MAX);
+    rc = sceRegMgrGetStr(n, val, ACCOUNT_TYPE_MAX);
+    if(rc)
+	notify_err("GetAccountType slot %d: sceRegMgrGetStr(0x%x) = 0x%x",
+		   account_numb, n, rc);
+    else
+	notify_dbg("GetAccountType slot %d: \"%s\"", account_numb, val);
+    return rc;
 }
 
 
@@ -85,7 +113,13 @@ int OffAct_SetAccountType(int account_numb, char val[ACCOUNT_TYPE_MAX])
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125874183U,
 				   127184903U);
-    return sceRegMgrSetStr(n, val, ACCOUNT_TYPE_MAX);
+    int rc = sceRegMgrSetStr(n, val, ACCOUNT_TYPE_MAX);
+    if(rc)
+	notify_err("SetAccountType slot %d \"%s\": sceRegMgrSetStr(0x%x) = 0x%x",
+		   account_numb, val, n, rc);
+    else
+	notify_dbg("SetAccountType slot %d: \"%s\" written OK", account_numb, val);
+    return rc;
 }
 
 
@@ -93,8 +127,15 @@ int OffAct_GetAccountFlags(int account_numb, int *val)
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125831168U,
 				   127141888U);
+    int rc;
     *val = 0;
-    return sceRegMgrGetInt(n, val);
+    rc = sceRegMgrGetInt(n, val);
+    if(rc)
+	notify_err("GetAccountFlags slot %d: sceRegMgrGetInt(0x%x) = 0x%x",
+		   account_numb, n, rc);
+    else
+	notify_dbg("GetAccountFlags slot %d: 0x%04x", account_numb, *val);
+    return rc;
 }
 
 
@@ -102,7 +143,13 @@ int OffAct_SetAccountFlags(int account_numb, int val)
 {
     int n = OffAct_GetEntityNumber(account_numb, 16U, 65536U, 125831168U,
 				   127141888U);
-    return sceRegMgrSetInt(n, val);
+    int rc = sceRegMgrSetInt(n, val);
+    if(rc)
+	notify_err("SetAccountFlags slot %d 0x%04x: sceRegMgrSetInt(0x%x) = 0x%x",
+		   account_numb, val, n, rc);
+    else
+	notify_dbg("SetAccountFlags slot %d: 0x%04x written OK", account_numb, val);
+    return rc;
 }
 
 

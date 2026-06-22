@@ -38,7 +38,7 @@ readme.h: README.md
 
 main.c: readme.h
 
-$(ELF): main.c offact.c IME_dialog.c SDL_listui.c
+$(ELF): main.c offact.c notify.c IME_dialog.c SDL_listui.c
 	$(CC) $(CFLAGS) -o $@ $(LDADD) $^
 
 clean:
