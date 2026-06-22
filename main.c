@@ -16,6 +16,7 @@ along with this program; see the file COPYING. If not, see
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <unistd.h>
 
 #include "IME_dialog.h"
 #include "SDL_listui.h"
@@ -194,16 +195,26 @@ int SDL_main(int argc, char* args[])
 
     notify_dbg("%s %s starting (%s %s)", WINDOW_TITLE, VERSION_TAG, __DATE__, __TIME__);
 
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER) < 0) {
-        notify_err("SDL_Init (full) failed: %s – retrying without audio", SDL_GetError());
-        printf("SDL_Init (full): %s\n", SDL_GetError());
-        if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
+    /* SDL_Init on PS5 may fail with EAGAIN ("Resource temporarily unavailable")
+     * when the DirectMemory pool is momentarily locked by the system.
+     * Retry for up to ~3 seconds before giving up. */
+    {
+        int sdl_ret = -1;
+        int tries = 0;
+        while(tries < 30) {
+            sdl_ret = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER);
+            if(sdl_ret == 0) break;
+            notify_dbg("SDL_Init attempt %d failed: %s", tries + 1, SDL_GetError());
+            usleep(100 * 1000); /* 100 ms */
+            tries++;
+        }
+        if(sdl_ret < 0) {
             printf("SDL_Init: %s\n", SDL_GetError());
-            notify_err("SDL_Init failed: %s", SDL_GetError());
+            notify_err("SDL_Init failed after %d attempts: %s", tries, SDL_GetError());
             return -1;
         }
+        notify_dbg("SDL_Init OK after %d attempt(s)", tries + 1);
     }
-    notify_dbg("SDL_Init OK");
 
     if(!(window=SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED,
 				 SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
